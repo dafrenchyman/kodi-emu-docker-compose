@@ -1,0 +1,38 @@
+<playercorefactory>
+ <players>
+   <player name="Retro-arch" type="ExternalPlayer" audio="false" video="true">
+     <filename>/usr/bin/retroarch</filename>
+     <args>--fullscreen "{1}"</args>
+     <hidexbmc>false</hidexbmc>
+     <hideconsole>false</hideconsole>
+     <warpcursor>none</warpcursor>
+   </player>
+   <player name="PPSSPP" type="ExternalPlayer" audio="false" video="true">
+     <filename>/usr/games/ppsspp</filename>
+     <args>"{1}"</args>
+     <hidexbmc>false</hidexbmc>
+     <hideconsole>false</hideconsole>
+     <warpcursor>none</warpcursor>
+   </player>
+   <player name="PCSX2" type="ExternalPlayer" audio="false" video="true">
+     <filename>/usr/games/PCSX2</filename>
+     <args>"--fullboot --fullscreen {1}"</args>
+     <hidexbmc>false</hidexbmc>
+     <hideconsole>false</hideconsole>
+     <warpcursor>none</warpcursor>
+   </player>
+   <player name="Dolphin" type="ExternalPlayer" audio="false" video="true">
+     <filename>/usr/games/dolphin-emu</filename>
+     <args>"--exec={1}"</args>
+     <hidexbmc>false</hidexbmc>
+     <hideconsole>false</hideconsole>
+     <warpcursor>none</warpcursor>
+   </player>
+ </players>
+ <rules action="prepend">
+   <!--rule filetypes="chd" filename="*(PSX)*" player="Retro-arch"/-->
+   <rule filetypes="iso" filename="*(PSP)*" player="PPSSPP"/>
+   <rule filetypes="cso" player="PCSX2"/>
+   <rule filetypes="gcm" player="Dolphin"/>
+ </rules>
+</playercorefactory>

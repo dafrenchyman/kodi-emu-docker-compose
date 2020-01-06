@@ -1,0 +1,101 @@
+---
+version: '2'
+services:
+
+  mariadb_kodi:
+    image: linuxserver/mariadb:latest
+    container_name: mariadb_kodi
+    hostname: mariadb_kodi
+    volumes:
+      - /etc/localtime:/etc/localtime:ro # Sync with system time
+      - ./volumes/mariadb:/config:rw
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - MYSQL_ROOT_PASSWORD=${MARIADB_PASS}
+      - MYSQL_USER=kodi
+      - MYSQL_DATABASE=kodi
+      - MARIADB_PASS=${MARIADB_PASS}
+    # command:
+      #- /bin/bash
+      #- -c
+      #- |
+      #  /init
+      #  sleep 5
+      #  mysql -p${MARIADB_PASS} -e "CREATE USER IF NOT EXISTS 'kodi' IDENTIFIED BY 'kodi';"
+      #  mysql -p${MARIADB_PASS} -e "SET PASSWORD FOR 'kodi'@'%' = PASSWORD('${MARIADB_PASS}');"
+      #  mysql -p${MARIADB_PASS} -e "GRANT ALL ON *.* TO 'kodi';"
+      #  mysql -p${MARIADB_PASS} -e "flush privileges;"
+
+  kodi:
+    build: 
+      context: ./kodi/
+      args:
+        NVIDIA_VER: ${NVIDIA_VER}
+    group_add:
+      - ${AUDIO_GROUP}
+    container_name: kodi
+    hostname: kodi   
+    # image: erichough/kodi:latest    
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - container=docker
+      - DISPLAY=${DISPLAY}
+      - NVIDIA_VER=${NVIDIA_VER}
+      - XAUTHORITY=/x11docker/Xclientcookie
+      - GAMEPAD_USB_PASSTHROUGH=${GAMEPAD_USB_PASSTHROUGH}
+      - GAMEPAD_USB_EVENT=${GAMEPAD_USB_EVENT}
+      - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
+    user: "${PUID}:${PGID}"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro # Sync with system time
+      - ./volumes/kodi:/root:rw
+      # Video Card
+      - /dev/dri:/dev/dri:rw
+      - /dev/nvidia0:/dev/nvidia0:rw
+      - /dev/nvidiactl:/dev/nvidiactl:rw
+      - /dev/nvidia-modeset:/dev/nvidia-modeset:rw
+      - /dev/nvidia-uvm:/dev/nvidia-uvm:rw
+      - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:rw
+      - /dev/vga_arbiter:/dev/vga_arbiter:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /tmp/.X11-unix/X0:/X0:rw
+      # Sound
+      - /dev/snd:/dev/snd:rw
+      - ${XDG_RUNTIME_DIR}/pulse/native:${XDG_RUNTIME_DIR}/pulse/native:rw
+      - ~/.config/pulse/cookie:/root/.config/pulse/cookie:rw
+      # Gamepad
+      - /dev/bus/usb:/dev/bus/usb:rw
+      - /dev/input:/dev/input:rw
+      # Data shares you want to share
+      - /mnt/SnapDisk_8TB_05/Movies:/data/Movies_8TB_05:ro
+      - /mnt/NonSnap_8TB_01/Consoles:/data/Consoles:rw
+    devices:
+      # Video Card
+      - /dev/dri:/dev/dri:rw
+      - /dev/nvidia0:/dev/nvidia0:rw
+      - /dev/nvidiactl:/dev/nvidiactl:rw
+      - /dev/nvidia-modeset:/dev/nvidia-modeset:rw
+      - /dev/nvidia-uvm:/dev/nvidia-uvm:rw
+      - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:rw
+      - /dev/vga_arbiter:/dev/vga_arbiter:rw
+      # Sound
+      - /dev/snd:/dev/snd:rw
+      # Gamepad
+      - /dev/input/${GAMEPAD_USB_PASSTHROUGH}:/dev/input/${GAMEPAD_USB_PASSTHROUGH}:rw
+      - /dev/input/${GAMEPAD_USB_EVENT}:/dev/input/${GAMEPAD_USB_EVENT}:rw
+    entrypoint: ""
+    depends_on:
+      - mariadb_kodi
+    command: >
+        bash -c "/usr/bin/kodi-standalone"
+
+
+# DISPLAY=:0 /usr/bin/kodi-standalone"
+# /init
+# /usr/games/PCSX2"
+                 
+
+#"
+

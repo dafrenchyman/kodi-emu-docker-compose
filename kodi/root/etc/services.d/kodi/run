@@ -1,0 +1,13 @@
+#!/usr/bin/with-contenv bash
+
+_term() {
+  echo "Caught SIGTERM signal!"
+  KODI_PID=`pidof kodi-x11`
+  kill -TERM ${KODI_PID} 2>/dev/null
+}
+
+trap _term SIGTERM
+s6-setuidgid abc kodi-standalone
+KODI_PID=`pidof kodi-x11`
+kill -TERM ${KODI_PID} 2>/dev/null
+wait
